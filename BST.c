@@ -92,7 +92,7 @@ int size(struct node* node)
 	}
 	else
 	{
-		return(size(node->left) + 1 + size(node->right));
+		return(size(node->left) + 1 + size(node->right)); //remember add 1 for root
 	}
 }
 
