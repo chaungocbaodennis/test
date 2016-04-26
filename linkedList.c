@@ -154,11 +154,9 @@ void deleteNode(struct ListNode* node_todelete)
     if (!node_todelete) return;
     temp = node_todelete->next;
     if (!temp) return; // cannot be solved if want to delete last node, give only access to that node
-    /*
-     the idea is not actually delete "node_todelete"
+    /* the idea is not actually delete "node_todelete"
      but copy all the content of the node after node_todelete into node_todelete
-     then delete that node
-     */
+     then delete that node  */
     node_todelete->val = temp->val;
     node_todelete->next = temp->next;
     free(temp);
@@ -167,41 +165,39 @@ void deleteNode(struct ListNode* node_todelete)
 /* also work but more cryptic
 	struct ListNode* tofree = node->next;
  	*node = *(node->next);
-	free(tofree);
-*/
-
+	free(tofree);*/
 }
 
 /* Function to remove duplicates from a unsorted linked list */
 void removeDuplicateNodes(struct ListNode *head)
 {
-  struct ListNode *ptr1, *runner, *dup;
-  ptr1 = head;
-
-  /* Pick elements one by one */
-  while(ptr1 != NULL && ptr1->next != NULL)
-  {
-	 runner = ptr1;
-
-     /* Compare the picked element with rest of the elements */
-     while(runner->next != NULL)
-     {
-       /* If duplicate then delete it */
-       if(ptr1->val == runner->next->val)
-       {
-          /* sequence of steps is important here */
-          dup = runner->next; //get hold of the addr to this duplicate node first, so later can delete
-          runner->next = runner->next->next;
-          free(dup); //important: prevent memory leak
-       }
-       else /* This is tricky */
-       {
-    	   runner = runner->next;
-       }
-     }
-     ptr1 = ptr1->next; //advance to next node
-  }
+	struct ListNode *ptr1, *runner, *dup;
+	ptr1 = head;
+	/* Pick elements one by one */
+	while (ptr1 != NULL && ptr1->next != NULL )
+	{
+		runner = ptr1;
+		/* Compare the picked element with rest of the elements
+		 * note that linked list work best to look FORWARD, not backward*/
+		while (runner->next != NULL ) /* cannot use runner directly: will have difficulty to delete last node */
+		{
+			/* If duplicate then delete it */
+			if (ptr1->val == runner->next->val)
+			{
+				/* sequence of steps is important here */
+				dup = runner->next; /* get hold of the addr to this duplicate node first, so later can delete */
+				runner->next = runner->next->next;
+				free(dup); /* important: prevent memory leak */
+			}
+			else /* advance runner */
+			{
+				runner = runner->next;
+			}
+		}
+		ptr1 = ptr1->next; //advance to next node
+	}
 }
+
 /* head_ref is a double pointer which points to head (or start) pointer
   of linked list */
 static void reverse_linkedlist(struct ListNode** head_ref)
@@ -220,40 +216,39 @@ static void reverse_linkedlist(struct ListNode** head_ref)
     				  // We need to change *head_ref so that the head pointer now starts pointing to the last node
 }
 
+/* http://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
+ * http://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.c
+ * The algorithm used is Mergesort, because that works really well
+ * on linked lists, without requiring the O(N) extra space it needs
+ * when you do it on arrays. */
+
 int cmp(struct ListNode *a, struct ListNode *b)
 {
     return ((a->val) - (b->val));
 }
 
-/*
- * This is the actual sort function. Notice that it returns the new
+/* This is the actual sort function. Notice that it returns the new
  * head of the list. (It has to, because the head will not
  * generally be the same element after the sort.) So unlike sorting
- * an array, where you can do
- *
- *     sort(myarray);
- *
+ * an array, where you can do :
+ *   sort(myarray);
  * you now have to do
- *
- *     list = listsort(mylist);
- */
+ *   list = listsort(mylist); */
 struct ListNode *listsort(struct ListNode *list, int is_circular, int is_double)
 {
 	struct ListNode *p, *q, *e, *tail, *oldhead,*temp_list;
 	int insize, nmerges, psize, qsize, i;
 
-	/*
-	 * Silly special case: if `list' was passed in as NULL, return
-	 * NULL immediately.
-	 */
+	/* Silly special case: if `list' was passed in as NULL, return
+	 * NULL immediately. */
 	if (!list)	{return NULL;}
-	temp_list = list; //for printf debug purpose only
-	insize = 1;//every iteration, will double the size
+	temp_list = list; /* for printf debug purpose only */
+	insize = 1; /* every iteration, will double the size */
 
 	while (1)
 	{
 		p = list;
-		oldhead = list;		       /* only used for circular linkage */
+		oldhead = list;	 /* only used for circular linkage */
 		list = NULL;
 		tail = NULL;
 
@@ -266,8 +261,8 @@ struct ListNode *listsort(struct ListNode *list, int is_circular, int is_double)
 			/* step `insize' places along from p */
 			q = p;
 			psize = 0;
-            //Step q along the list by insize places,
-            //or until the end of the list, whichever comes first
+            /* Step q along the list by insize places,
+             or until the end of the list, whichever comes first */
 			for (i = 0; i < insize; i++)
 			{
 				psize++;
@@ -314,11 +309,11 @@ struct ListNode *listsort(struct ListNode *list, int is_circular, int is_double)
 				printf ("e [%d %d] ",e->val,e);
 
 				/* add the next element to the merged list */
-				if (tail) //tail hold addr of "previous" e
+				if (tail) /* tail hold addr of "previous" e */
 				{
 					tail->next = e;
 				}
-				else //tail reset to NULL each iteration (of insize), thus this is first item in the sorted list
+				else /* tail reset to NULL each iteration (of insize), thus this is first item in the sorted list */
 				{
 					list = e;
 					printf ("list [%d %d] ",list->val,list);
@@ -334,7 +329,8 @@ struct ListNode *listsort(struct ListNode *list, int is_circular, int is_double)
 				printf ("tail [%d %d] ",tail->val,tail);
 			}
 
-			/* now p has stepped `insize' places along, and q has too */
+			/* now p has stepped `insize' places along, and q has too
+			 * repeat */
 			p = q;
 		}
 

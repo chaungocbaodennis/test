@@ -1,8 +1,10 @@
 #include<stdio.h>
 #include<string.h>
 #include<time.h>
+#include<limits.h>
 #include"linkedList.h"
 #include"Dictionary.h"
+#include"BST.h"
 
 int const buffer_size = 256;
 	//char buffer[buffer_size];
@@ -26,41 +28,41 @@ enum state state_var;
 // A utility function of print an array of size n
 void printArray(int arr[], int first,int end)
 {
-   int i;
-   for (i=first; i <= end; i++)
-       printf("%d ", arr[i]);
-   printf("\n");
+	int i;
+	for (i=first; i <= end; i++)
+		printf("%d ", arr[i]);
+	printf("\n");
 }
 
 int fib_recursive(int n)
 {
-   if (n <= 1)
-	   return n;
-   else
-	   return fib_recursive(n-1) + fib_recursive(n-2); //Time Complexity: T(n) = T(n-1) + T(n-2) which is exponential.
+	if (n <= 1)
+		return n;
+	else
+		return fib_recursive(n-1) + fib_recursive(n-2); //Time Complexity: T(n) = T(n-1) + T(n-2) which is exponential.
 }
 
 
 int fib_iterative(int n)
 {
-  int a = 0, b = 1, c, i;
+	int a = 0, b = 1, c, i;
 
-  if( n == 0)
-  {
-    return a;
-  }
-  else if (n == 1)
-  {
-	  return b;
-  }
+	if( n == 0)
+	{
+		return a;
+	}
+	else if (n == 1)
+	{
+		return b;
+	}
 
-  for (i = 2; i <= n; i++)
-  {
-     c = a + b;
-     a = b;
-     b = c;
-  }
-  return b;
+	for (i = 2; i <= n; i++)
+	{
+		c = a + b;
+		a = b;
+		b = c;
+	}
+	return c;
 }
 
 /**********************************************************************
@@ -106,12 +108,10 @@ unsigned char isPowerOfTwo_divMethod(int n)
 	}
 	else
 	{
-		/*
-		 * keep divide by 2
+		/* keep divide by 2
 		 * once remainder non-zero: jump out the loop and return FALS
 		 * however, corner case is when n reach 2:
-		 * if reach 2 means definitely this is a power of 2
-		 */
+		 * if reach 2 means definitely this is a power of 2 */
 		while (n%2 == 0)
 		{
 			//printf("n is: %d \n", n);
@@ -132,9 +132,7 @@ unsigned char isPowerOfTwo_bitCheckMethod(int n)
 
 	if (n < 1) return 0;
 
-	/*
-	 * if power of 2, should be only 1 digit "1"
-	 */
+	/* if power of 2, should be only 1 digit "1" */
 	for (idx = 0; idx < numOfBitToCheck; idx ++)
 	{
 		if ((n & 0x00000001) == 1)
@@ -148,6 +146,82 @@ unsigned char isPowerOfTwo_bitCheckMethod(int n)
 	else return 0;
 }
 
+/* Given a positive integer which fits in a 32 bit signed integer,
+ * ind if it can be expressed as A^P where P > 1 and A > 0.
+ * A and P both should be integers. */
+unsigned char isPower(int x)
+{
+    /* brute force */
+	/* http://qa.geeksforgeeks.org/3679/find-if-a-given-positive-integer-can-be-expressed-as-a-p */
+	if (x <= 1) return 1;
+    for (int base = 2; (base < x) && base < (INT_MAX / base); base++)
+    {
+        int temp = base;
+        while (temp <= x &&
+        		temp < INT_MAX / base) /* prevent int overflow: temp*base < INT_MAX */
+        {
+            temp *= base;
+            if (temp == x) return 1;
+        }
+    }
+    return 0;
+}
+
+/* program to print all primes smaller than or equal to
+ * n using Sieve of Eratosthenes
+ * http://www.geeksforgeeks.org/sieve-of-eratosthenes/ */
+void getAllPrimeNumbers(int n)
+{
+    /* Create a boolean array "prime[0..n]" and initialize
+     * all entries it as TRUE. */
+    unsigned char prime[n+1];
+    memset(prime, 1, sizeof(prime)/sizeof(prime[0]));
+
+    /* Elimination strategy: loop through array, set those NOT prime to FALSE
+     * start with 2, the smallest prime */
+    for (int p = 2; p*p <= n; p++)
+    {
+        /* If prime[p] is not changed, then it IS a prime */
+        if (prime[p] == 1)
+        {
+            /* So all multiple of p is NOT a prime
+             * start from p*p because p*(p-1) or p*(p-2) .. definite not prime (they divide by p and (P-1) or (p-2_
+             * that's also explain why outer loop check for p*p <= n*/
+            for (int i = p*p; i <= n; i += p)
+            {
+            	prime[i] = 0;
+            }
+        }
+    }
+
+    // Print all prime numbers
+//    for (int p = 2; p <= n; p++)
+//       if (prime[p])
+//          cout << p << " ";
+}
+
+/* Compute and return the square root of x.
+ * If x is not a perfect square, return floor(sqrt(x))*/
+int sqrt(int x)
+{
+    if (x == 0) return 0;
+    int start = 1, end = x, ans;
+    /* binary search */
+    while (start <= end)
+    {
+        int mid = (start + end) / 2;
+        if (mid <= x / mid) /* this is a clever way to avoid overflow mid*mid <= x */
+        {
+            start = mid + 1;
+            ans = mid;
+        }
+        else
+        {
+            end = mid - 1;
+        }
+    }
+    return ans;
+}
 
 /***********************************************************************************************
 Given an array and a value, remove all instances of that value in place and return the new length.
@@ -200,7 +274,7 @@ unsigned int reverseBits(unsigned int n) {
 //		}
 //	}
 
-	for (cnt = 0; cnt < 32; cnt++)
+	for (cnt = 0; cnt < 31; cnt++)
 	{
 		//printf ("shifted number %x \n",(n >> cnt));
 
@@ -401,12 +475,14 @@ char isLittleEndian (void)
 	}
 }
 
-/*
- * Given an array of integers and an integer k,
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////           ARRAY     //////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/* Given an array of integers and an integer k,
  * find out whether there are two distinct indices i and j in the array
  * such that nums[i] = nums[j] and the difference between i and j
- * is at most k.
- */
+ * is at most k.*/
 unsigned char containsNearbyDuplicate(int* nums, int numsSize, int k)
 {
 	int  start_idx,stop_idx,i,y = 0;
@@ -442,15 +518,512 @@ unsigned char containsNearbyDuplicate(int* nums, int numsSize, int k)
 	}
 }
 
+/* Remove duplicates from Sorted Array
+ * given a sorted array, remove the duplicates in place such that each element appears only once
+ * and return the new length.
+ * Note that even though we want you to return the new length,
+ * make sure to change the original array as well in place */
+int removeDuplicates(int* A, int n1)
+{
+    unsigned int i,j,temp,newlen;
+    if (n1 <= 1) return n1;
+    j = 1;
+    newlen = n1;
+    /* because array is SORTED, duplicates will be continuous element
+     * thus, we search for first element after duplicates and swap */
+    for (i = 0 ; i < n1; i ++)
+    {
+        for (;j < n1 ;j++) /* note that j do not reset */
+        {
+            if (A[i] == A[j]) /* duplicate: reduce new len */
+            {
+                newlen--;
+            }
+            else
+            {
+                if  (j > (i+1)) /* first element after duplicates range */
+                {
+                    A[i+1] = temp; /*swap with (i+1) */
+                    A[i+1] = A[j];
+                    A[j] = A[i+1];
+                    j++;
+                    break; /* break to outer loop */
+                }
+                else /* different but  j just next to i */
+                {
+                    j++;
+                    break;
+                }
+            }
+        }
+    }
+    return newlen;
+}
+
+void reverse_array(int *nums , int begin , int end)
+{
+    int tmp;
+    unsigned int idx;
+
+    while(begin < end)
+    {
+        tmp = nums[begin];
+        nums[begin] = nums[end];
+        nums[end] = tmp;
+        begin++;
+        end--;
+    }
+//	for (idx = 0; idx < 7; idx++)
+//	{
+//		printf ("array element is: [%d] --> %d \n", idx, nums[idx]);
+//	}
+//	printf ("================ \n");
+}
+
+
+/* ROTATE ARRAY: k = 2
+ * Input:  arr[] = [1, 2, 3, 4, 5, 6, 7]
+ * Output: arr[] = [3, 4, 5, 6, 7, 1, 2] */
+void rotate_array(int* nums, int numsSize, int k)
+{
+    if((k == 0) || (k == numsSize))
+    	return;
+    if(numsSize == 0 )
+    	return;
+/* array rotation is achieve by 2 steps:
+ * 1: reverse entire array
+ * 2: reverse 2 sub-array to re-construct original order */
+
+    reverse_array(nums,0,numsSize-1);
+
+    if( k > numsSize)
+    	k = k % numsSize;
+
+    if( (numsSize - k) != 0)
+    {
+    	reverse_array(nums,0,k-1);
+    	reverse_array(nums,k,numsSize-1);
+    }
+}
+
+/* Find the CONTIGUOUS subarray within an array (containing at least one number) which has the LARGEST SUM
+ * http://javabypatel.blogspot.sg/2015/08/find-largest-sum-contiguous-subarray-using-Kadane-algorithm.html */
+int maxSubArray(const int* A, int n1)
+{
+    /* Kadane's algorithm */
+	unsigned int idx = 0;
+	unsigned int start_idx = 0, end_ix = 0; /* index of the return subarray which has largest sum */
+    int max_ending_here = 0; /* positive contiguous segments of the array */
+    int max_so_far = 0; /*  maximum sum contiguous segment among all positive segments */
+
+    /* if all elements are negative, adding them up only make Sum smaller
+     * therefore, this variable used to keep track of largest single element */
+    int max_single = A[0];
+
+    if (n1 <= 0) return 0; /* not really helpful. Caller should check by itself */
+
+    /* let's concentrate on the scenario wherein there are positive and negative elements*/
+    for (idx = 0; idx < n1; idx++)
+    {
+        max_single = (A[idx] > max_single) ? A[idx]:max_single; /* keep track of maximum element */
+
+        /* max_ending_here is running sum; its value may increasing or decreasing,
+         * but as long as its still positive, give it some chance :) */
+        max_ending_here = max_ending_here + A[idx];
+
+        /* if we hit a negative element that just so negative that bring running sum down below 0
+         * means the sub array until this point is "hopeless", let's reset !  */
+        if (max_ending_here < 0)
+        {
+        	start_idx = idx + 1;
+        	max_ending_here = 0;
+        }
+        if (max_ending_here > max_so_far)
+        {
+        	end_ix = idx;
+        	max_so_far = max_ending_here;
+        }
+    }
+
+    if (max_so_far <= 0) return max_single;
+    return max_so_far;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////           SORTING     ////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+void quicksort_arr(int arr[],int first,int last)
+{
+	int pivot,j,temp,i;
+	/* The basic concept is to pick one of the elements in the array as a pivot value
+	 * around which the other elements will be rearranged.
+	 * Everything less than the pivot is moved to the left of the pivot (into the left partition).
+	 * Similarly, everything greater than the pivot goes into the right partition.
+	 * At this point each partition is recursively quicksorted. */
+	printf("Initial array[%d->%d]: ",first,last);
+	printArray(arr,first,last);
+	if(first < last)
+	{
+		pivot = first; /* take the pivot as the left most item */
+		i = first;
+		j = last;
+
+		while(i < j)
+		{
+			while(arr[i] <= arr[pivot] && i < last)
+			{
+				i++; /* advance to right until hit either last item or hit an item > pivot */
+			}
+
+			while(arr[j] > arr[pivot]) /* larger than pivot, move from right */
+			{
+				j--;
+			}
+
+			if(i < j)
+			{
+				//swap
+				temp = arr[i];
+				arr[i] = arr[j];
+				arr[j] = temp;
+				printArray(arr,first,last);
+			}
+		}
+		/* once step out of this while() loop, i and j cross over or i == j */
+		printf("pivot new idx: %d\n",j);
+		/* swap the pivot item with the middle item after partition */
+		temp = arr[pivot];
+		arr[pivot] = arr[j];
+		arr[j]= temp;
+
+		/* less or equal than pivot: [first..j-1]
+		 * larger than pivot [j+1..last]*/
+		printArray(arr,first,last);
+
+		/* recursively do for two halves */
+		quicksort_arr(arr,first,j-1);
+		quicksort_arr(arr,j+1,last);
+	}
+}
+
+void merge_arr(int arr[], int first, int mid, int last)
+{
+	int* temp_arr = (int*)malloc((last+1) * sizeof (int));
+    int i = first, j = mid + 1, k = 0;
 /*
- * Given a string s consists of upper/lower-case alphabets and empty space characters ' ',
+ *  merge 2 sorted sub-array: [first..mid] and [mid+1..last]
+ */
+    //check one by one in both sub array and copy in increasing order
+    while (i <= mid && j <= last) //once this loop done, one of the 2 sub-array are exhausted
+    {
+        if (arr[i] <= arr[j])
+        	{temp_arr[k++] = arr[i++];}
+        else
+        	{temp_arr[k++] = arr[j++];}
+    }
+
+    //copy the rest into temp array
+    while (i <= mid)
+    	{temp_arr[k++] = arr[i++];}
+
+    while (j <= last)
+    	{temp_arr[k++] = arr[j++];}
+
+    k--; //important because now k is 1 step above last index, need to minus 1
+    while (k >= 0)
+    {
+    	arr[first + k] = temp_arr[k]; //copy data from temp array back to original array
+        k--;
+    }
+    free(temp_arr);
+    printf ("merge_arr[%d..%d..%d] : ",first,mid,last);
+    printArray(arr,first,last);
+}
+
+void mergeSort_arr(int arr[], int first, int last)
+{
+    printf ("mergeSort_arr[%d..%d]: ",first,last);
+    printArray(arr,first,last);
+	if (first < last)
+    {
+        int m = (last + first)/2;
+        mergeSort_arr(arr, first, m);
+        mergeSort_arr(arr, m + 1, last);
+        merge_arr(arr, first, m, last);
+    }
+}
+
+void bubbleSort_arr(int arr[],int len)
+{
+	int i,x,k,temp,any_swap_done = 1;
+
+	printf("Initial array: ");
+	printArray(arr,0,len-1);
+
+	/* repeatedly move the largest element to the highest index position of the array */
+	for(i = 0;any_swap_done && (i < len - 1); i++) /* if previous run, no swap done, means already sorted */
+	{
+		any_swap_done = 0;
+		for (k = 0; k < len - i - 1;k++) /* after each iteration, the largest items already at last indexes */
+		{
+			if (arr[k] > arr[k+1])
+			{
+				temp = arr[k];
+				arr[k] = arr[k+1];
+				arr[k+1] = temp;
+				any_swap_done = 1;
+			}
+		}
+
+		printf("Sorting %d:     ",i);
+		printArray(arr,0,len-1);
+	}
+
+	printf("Sorted array:  ");
+	printArray(arr,0,len-1);
+}
+
+void selectionSort_arr(int arr[], int len)
+{
+	int i,x, eff_size, maxpos, tmp;
+	printf("Initial array: ");
+	printArray(arr,0,len-1);
+	/*
+	 * repeatedly find the next largest element in the array and move it to its highest position in the sorted array
+	 */
+	for (eff_size = len; eff_size > 1; eff_size--) //after each iteration, largest item will be move to the end; hence, shrink "effective" array by one
+	{
+		for (i = 0; i < eff_size; i++)
+		{
+			maxpos = (arr[i] > arr[maxpos] ? i : maxpos); //update index of largest item
+		}
+		//swap largest item to last index in the "effective" array
+		tmp = arr[maxpos];
+		arr[maxpos] = arr[eff_size - 1];
+		arr[eff_size - 1] = tmp;
+
+		printf("Sorting %d:     ",i);
+		printArray(arr,0,len-1);
+	}
+	printf("Sorted array:  ");
+	printArray(arr,0,len-1);
+}
+
+/* Function to sort an array using insertion sort*/
+void insertionSort_arr(int arr[], int len)
+{
+	int i, key, j;
+
+	printf("Initial array: ");
+	printArray(arr,0,len-1);
+
+	for (i = 1; i < len; i++)
+	{
+		/*every iteration looks at sub array [0..i]
+		 *after each iteration, sub array [0..i] is sorted */
+
+		key = arr[i]; /* set the key to be last element of sub array */
+		j = i-1; /* check all the other element , from right -> left */
+
+		/* note that j is initialize to (i-1)
+		 * only need to advance j (right->left) if  arr[j] > key */
+		while (j >= 0 && arr[j] > key)
+		{
+			/* Move elements of arr[0..i-1], that are greater than key, to one position ahead
+			 * of their current position (i.e copy to the right).
+			 * This will result in duplicate
+			 * Eventually, the last duplicate will be replace by key */
+			arr[j+1] = arr[j];
+			j--;
+			printf("Sorting %d:     ",i);
+			printArray(arr,0,len-1);
+		}
+		arr[j+1] = key;
+
+		/* after every iteration, sub array [0..i] is sorted */
+		printf("Sorting %d:     ",i);
+		printArray(arr,0,len-1);
+	}
+
+	printf("Sorted array:  ");
+	printArray(arr,0,len-1);
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+int binary(int a[],int element_to_be_search,int start_idx,int end_idx)
+{
+	int mid = 0;
+	int c = 0;
+
+	if(start_idx <= end_idx)
+	{
+		mid = (end_idx + end_idx)/2;
+		if(element_to_be_search == a[mid])
+		{
+			c = 1;
+			return c;
+		}
+		else if(element_to_be_search < a[mid])
+		{
+			return binary(a,element_to_be_search,start_idx,mid-1);
+		}
+		else
+			return binary(a,element_to_be_search,mid+1,end_idx);
+	}
+	else
+	{
+		return c;
+	}
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////           STRING     ////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* Swaps strings by swapping pointers */
+/* have to use double pointer */
+void swap_string1(char **str1_ptr, char **str2_ptr)
+{
+	char *temp = *str1_ptr;
+	*str1_ptr = *str2_ptr;
+	*str2_ptr = temp;
+}
+
+/* Swaps strings by swapping data*/
+void swap_string2(char *str1, char *str2)
+{
+	char *temp = (char *)malloc((strlen(str1) + 1) * sizeof(char));
+	strcpy(temp, str1);
+	strcpy(str1, str2);
+	strcpy(str2, temp);
+	free(temp);
+}
+
+/* return the string length except /0 */
+unsigned int string_len(char* str)
+{
+	unsigned int string_length = 0;
+	while (*str != 0)
+	{
+		str++;
+		string_length++;
+	}
+	return string_length;
+}
+
+/* property of XOR:
+ * C = A XOR B -> C XOR A == B ; C XOR B == A
+ * X XOR X = 0
+ * X ^ 0 =  X*/
+#define XOR_SWAP(a,b) do\
+    {\
+      a ^= b;\
+      b ^= a;\
+      a ^= b;\
+    } while (0)
+
+void reverse_string_inplace(char*str)
+{
+	char* end_idx = str + strlen(str) - 1;
+    // swap the values in the two given variables
+    // XXX: fails when a and b refer to same memory location
+
+    // walk inwards from both ends of the string,
+    // swapping until we get to the middle
+	while (str < end_idx)
+	{
+		XOR_SWAP(*str, *end_idx);
+		str++;
+		end_idx--;
+	}
+}
+
+/*Function to reverse any sequence starting with pointer
+  begin and ending with pointer end  */
+void reverse(char *begin, char *end)
+{
+	char temp;
+	while (begin < end)
+	{
+		temp = *begin;
+		*begin++ = *end;
+		*end-- = temp;
+	}
+}
+
+/* INPUT: “i like this program very much” */
+void reverseWords(char *s)
+{
+    char *word_begin = NULL;
+    char *temp = s; /* temp is for word boundry */
+
+    /*STEP 1 Reverse the individual words, we get the below string
+     * "i ekil siht margorp yrev hcum" */
+    while(*temp)
+    {
+        /*This condition is to make sure that the string start with
+          valid character (not space) only*/
+        if ((word_begin == NULL) && (*temp != ' '))
+        {
+            word_begin = temp;
+        }
+        /* hit space or string terminator */
+        if(word_begin && ((*(temp+1) == ' ') || (*(temp+1) == '\0')))
+        {
+        	reverse(word_begin, temp);
+            word_begin = NULL;
+        }
+        temp++;
+    }
+
+    /*STEP 2 Reverse the whole string from start to end and you get the desired output
+     * "much very program this like i" */
+    reverse(s, temp-1);
+}
+
+char *string_reverse2(const char *string)
+{
+	char* new_string = (char*)malloc((strlen(string)+1)*sizeof(char));
+	char idx = 0;
+	for (idx = 0; idx < strlen(string); idx++)
+	{
+		new_string[idx] = string [strlen(string) - idx - 1];
+	}
+	new_string[strlen(string)] = '\0';
+	return new_string;
+}
+
+void naive_Pattern_Search(char *pat, char *txt)
+{
+    int M = strlen(pat);
+    int N = strlen(txt);
+    int i = 0;
+    /* A loop to slide pat[] one by one */
+    for (i = 0; i <= N - M; i++) // No need to loop the entire txt[]. If got match, worst case is the match at the end
+    {
+        int j;
+
+        /* For current index i, check for pattern match */
+        for (j = 0; j < M; j++)
+        {
+        	if (txt[i+j] != pat[j]) break;
+        }
+
+        if (j == M)  // if pat[0...M-1] = txt[i, i+1, ...i+M-1]
+        {
+        	printf("Pattern found at index %d \n", i);
+        }
+    }
+}
+
+
+
+/*Given a string s consists of upper/lower-case alphabets and empty space characters ' ',
  * return the length of last word in the string.
 * If the last word does not exist, return 0.
 * Note: A word is defined as a character sequence consists of non-space characters only.
 * For example,
 * Given s = "Hello World",
-* return 5.
- */
+* return 5. */
 int lengthOfLastWord(char* s)
 {
 	unsigned int strlen = 0;
@@ -490,8 +1063,7 @@ int lengthOfLastWord(char* s)
 	}
 }
 
-/*
- * Compare two version numbers version1 and version2.
+/* Compare two version numbers version1 and version2.
  * If version1 > version2 return 1,
  * 		if version1 < version2 return -1,
  * 		otherwise return 0.
@@ -500,9 +1072,7 @@ int lengthOfLastWord(char* s)
  * For instance, 2.5 is not "two and a half" or "half way to version three",
  * it is the fifth second-level revision of the second first-level revision.
  * Here is an example of version numbers ordering:
- * 0.1 < 1.1 < 1.2 < 13.37
- */
-
+ * 0.1 < 1.1 < 1.2 < 13.37 */
 int compareVersion(char* version1, char* version2)
 {
 	unsigned int strlen1 = 0;
@@ -593,426 +1163,7 @@ char* addBinary(char* a, char* b)
 	return res;
 }
 
-void reverse_array(int *nums , int begin , int end)
-{
-    int tmp;
-    unsigned int idx;
 
-    while(begin < end)
-    {
-        tmp = nums[begin];
-        nums[begin] = nums[end];
-        nums[end] = tmp;
-        begin++;
-        end--;
-    }
-//	for (idx = 0; idx < 7; idx++)
-//	{
-//		printf ("array element is: [%d] --> %d \n", idx, nums[idx]);
-//	}
-//	printf ("================ \n");
-}
-
-
-/* ROTATE ARRAY
- * Input:  arr[] = [1, 2, 3, 4, 5, 6, 7]
- *          k = 2
- *	Output: arr[] = [3, 4, 5, 6, 7, 1, 2]
- */
-void rotate_array(int* nums, int numsSize, int k)
-{
-    if((k == 0) || (k == numsSize))
-    	return;
-    if(numsSize == 0 )
-    	return;
-/* array rotation is achieve by 2 steps:
- * 1: reverse entire array
- * 2: reverse 2 sub-array to re-construct original order
- */
-
-    reverse_array(nums,0,numsSize-1);
-
-    if( k > numsSize)
-    	k = k % numsSize;
-
-    if( (numsSize - k) != 0)
-    {
-    	reverse_array(nums,0,k-1);
-    	reverse_array(nums,k,numsSize-1);
-    }
-}
-
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////           SORTING     ////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-void quicksort_arr(int arr[],int first,int last)
-{
-	int pivot,j,temp,i;
-	/*
-	 * The basic concept is to pick one of the elements in the array as a pivot value
-	 * around which the other elements will be rearranged.
-	 * Everything less than the pivot is moved left of the pivot (into the left partition).
-	 * Similarly, everything greater than the pivot goes into the right partition.
-	 * At this point each partition is recursively quicksorted.
-	 */
-	printf("Initial array[%d->%d]: ",first,last);
-	printArray(arr,first,last);
-	if(first < last)
-	{
-	 pivot = first; //take the pivot as the left most item
-	 i = first;
-	 j = last;
-
-	 while(i<j)
-	 {
-		 while(arr[i] <= arr[pivot] && i < last) //smaller or equal than the pivot, move from left
-		 {
-			 i++; //advance to right until hit either last item or hit an item > pivot
-		 }
-
-		 while(arr[j] > arr[pivot]) //larger than pivot, move from right
-		 {
-			 j--; //move back from right most until hit an item <= pivot
-		 }
-
-		 if(i < j)
-		 {
-			//swap
-			temp = arr[i];
-			arr[i] = arr[j];
-			arr[j] = temp;
-			printArray(arr,first,last);
-		 }
-	 }
-	 // once step out of this while() loop, i == j
-	 printf("pivot new idx: %d\n",j);
-	 //swap the pivot item with the middle item after partition
-	 temp = arr[pivot];
-	 arr[pivot] = arr[j];
-	 arr[j]= temp;
-
-	 printArray(arr,first,last);
-
-	 //recursively do for two halves
-	 quicksort_arr(arr,first,j-1);
-	 quicksort_arr(arr,j+1,last);
-	}
-}
-
-void merge_arr(int arr[], int first, int mid, int last)
-{
-	int* temp_arr = (int*)malloc((last+1) * sizeof (int));
-    int i = first, j = mid + 1, k = 0;
-/*
- *  merge 2 sorted sub-array: [first..mid] and [mid+1..last]
- */
-    //check one by one in both sub array and copy in increasing order
-    while (i <= mid && j <= last) //once this loop done, one of the 2 sub-array are exhausted
-    {
-        if (arr[i] <= arr[j])
-        	{temp_arr[k++] = arr[i++];}
-        else
-        	{temp_arr[k++] = arr[j++];}
-    }
-
-    //copy the rest into temp array
-    while (i <= mid)
-    	{temp_arr[k++] = arr[i++];}
-
-    while (j <= last)
-    	{temp_arr[k++] = arr[j++];}
-
-    k--; //important because now k is 1 step above last index, need to minus 1
-    while (k >= 0)
-    {
-    	arr[first + k] = temp_arr[k]; //copy data from temp array back to original array
-        k--;
-    }
-    free(temp_arr);
-    printf ("merge_arr[%d..%d..%d] : ",first,mid,last);
-    printArray(arr,first,last);
-}
-
-void mergeSort_arr(int arr[], int first, int last)
-{
-    printf ("mergeSort_arr[%d..%d]: ",first,last);
-    printArray(arr,first,last);
-	if (first < last)
-    {
-        int m = (last + first)/2;
-        mergeSort_arr(arr, first, m);
-        mergeSort_arr(arr, m + 1, last);
-        merge_arr(arr, first, m, last);
-    }
-}
-
-void bubbleSort_arr(int arr[],int len)
-{
-	int i,x,k,temp,any_swap_done = 1;
-
-	printf("Initial array: ");
-	printArray(arr,0,len-1);
-
-	/*
-	 * repeatedly move the largest element to the highest index position of the array
-	 */
-	for(i = 0;any_swap_done && (i < len - 1); i++) //if previous run, no swap done, means already sorted
-	{
-		any_swap_done = 0;
-		for (k = 0; k < len - i - 1;k++) //after each iteration, the largest items already at last indexes;
-		{
-			if (arr[k] > arr[k+1])
-			{
-				temp = arr[k];
-				arr[k] = arr[k+1];
-				arr[k+1] = temp;
-				any_swap_done = 1;
-			}
-		}
-
-		printf("Sorting %d:     ",i);
-		printArray(arr,0,len-1);
-	}
-
-	printf("Sorted array:  ");
-	printArray(arr,0,len-1);
-}
-
-void selectionSort_arr(int arr[], int len)
-{
-	int i,x, eff_size, maxpos, tmp;
-	printf("Initial array: ");
-	printArray(arr,0,len-1);
-	/*
-	 * repeatedly find the next largest element in the array and move it to its highest position in the sorted array
-	 */
-	for (eff_size = len; eff_size > 1; eff_size--) //after each iteration, largest item will be move to the end; hence, shrink "effective" array by one
-	{
-		for (i = 0; i < eff_size; i++)
-		{
-			maxpos = (arr[i] > arr[maxpos] ? i : maxpos); //update index of largest item
-		}
-		//swap largest item to last index in the "effective" array
-		tmp = arr[maxpos];
-		arr[maxpos] = arr[eff_size - 1];
-		arr[eff_size - 1] = tmp;
-
-		printf("Sorting %d:     ",i);
-		printArray(arr,0,len-1);
-	}
-	printf("Sorted array:  ");
-	printArray(arr,0,len-1);
-}
-
-/* Function to sort an array using insertion sort*/
-void insertionSort_arr(int arr[], int len)
-{
-	int i, key, j;
-
-	printf("Initial array: ");
-	printArray(arr,0,len-1);
-
-	for (i = 1; i < len; i++)
-	{
-		/*
-		 *every iteration looks at sub array [0..i]
-		 *after each iteration, sub array [0..i] is sorted
-		 */
-
-		key = arr[i]; //set the key to be last element of sub array
-		j = i-1; //check all the other element , from right -> left
-
-		/*
-		 * note that j is initialize to (i-1)
-		 * only need to advance j (right->left) if  arr[j] > key
-		 */
-		while (j >= 0 && arr[j] > key)
-		{
-			/*
-			 * Move elements of arr[0..i-1], that are greater than key, to one position ahead
-			 * of their current position (i.e copy to the right).
-			 * This will result in duplicate
-			 * Eventually, the last duplicate will be replace by key
-			*/
-			arr[j+1] = arr[j];
-			j--;
-			printf("Sorting %d:     ",i);
-			printArray(arr,0,len-1);
-		}
-		arr[j+1] = key;
-
-		//after every iteration, sub array [0..i] is sorted
-		printf("Sorting %d:     ",i);
-		printArray(arr,0,len-1);
-	}
-
-	printf("Sorted array:  ");
-	printArray(arr,0,len-1);
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-int binary(int a[],int element_to_be_search,int start_idx,int end_idx)
-{
-     int mid = 0;
-     int c = 0;
-
-     if(start_idx <= end_idx)
-     {
-          mid = (end_idx + end_idx)/2;
-          if(element_to_be_search == a[mid])
-          {
-              c = 1;
-              return c;
-          }
-          else if(element_to_be_search < a[mid])
-          {
-              return binary(a,element_to_be_search,start_idx,mid-1);
-          }
-          else
-              return binary(a,element_to_be_search,mid+1,end_idx);
-     }
-     else
-     {
-    	 return c;
-     }
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////           STRING     ////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////
-/* Swaps strings by swapping pointers */
-/* have to use double pointer */
-void swap_string1(char **str1_ptr, char **str2_ptr)
-{
-  char *temp = *str1_ptr;
-  *str1_ptr = *str2_ptr;
-  *str2_ptr = temp;
-}
-
-/* Swaps strings by swapping data*/
-void swap_string2(char *str1, char *str2)
-{
-  char *temp = (char *)malloc((strlen(str1) + 1) * sizeof(char));
-  strcpy(temp, str1);
-  strcpy(str1, str2);
-  strcpy(str2, temp);
-  free(temp);
-}
-
-/* return the string length except /0 */
-unsigned int string_len(char* str)
-{
-	unsigned int string_length = 0;
-	while (*str != 0)
-	{
-		str++;
-		string_length++;
-	}
-	return string_length;
-}
-
-#define XOR_SWAP(a,b) do\
-    {\
-      a ^= b;\
-      b ^= a;\
-      a ^= b;\
-    } while (0)
-
-
-void reverse_string_inplace(char*str)
-{
-	char* end_idx = str + strlen(str) - 1;
-    // swap the values in the two given variables
-    // XXX: fails when a and b refer to same memory location
-
-    // walk inwards from both ends of the string,
-    // swapping until we get to the middle
-	while (str < end_idx)
-	{
-		XOR_SWAP(*str, *end_idx);
-		str++;
-		end_idx--;
-	}
-}
-
-
-char *string_reverse2(const char *string)
-{
-	char* new_string = (char*)malloc((strlen(string)+1)*sizeof(char));
-	char idx = 0;
-	for (idx = 0; idx < strlen(string); idx++)
-	{
-		new_string[idx] = string [strlen(string) - idx - 1];
-	}
-	new_string[strlen(string)] = '\0';
-	return new_string;
-}
-
-void naive_Pattern_Search(char *pat, char *txt)
-{
-    int M = strlen(pat);
-    int N = strlen(txt);
-    int i = 0;
-    /* A loop to slide pat[] one by one */
-    for (i = 0; i <= N - M; i++) // No need to loop the entire txt[]. If got match, worst case is the match at the end
-    {
-        int j;
-
-        /* For current index i, check for pattern match */
-        for (j = 0; j < M; j++)
-        {
-        	if (txt[i+j] != pat[j]) break;
-        }
-
-        if (j == M)  // if pat[0...M-1] = txt[i, i+1, ...i+M-1]
-        {
-        	printf("Pattern found at index %d \n", i);
-        }
-    }
-}
-
-void computeLPSArray(char *pat, int M, int *lps)
-{
-	//https://www.youtube.com/watch?v=KG44VoDtsAA
-
-	int len = 0;  // length of the previous longest prefix suffix
-    int i;
-
-    lps[0] = 0; // lps[0] is always 0
-    i = 1;
-
-    // the loop calculates lps[i] for i = 1 to M-1
-    while (i < M)
-    {
-       if (pat[i] == pat[len])
-       {
-         len++;
-         lps[i] = len;
-         i++;
-       }
-       else // (pat[i] != pat[len])
-       {
-         if (len != 0) //which means: the previous sub-pattern has a prefix same as a suffix =>
-        	           // there is a same starting and ending sequence of length len
-        	 	       // now since (pat[i] != pat[len]), which means our matching streak has stopped
-        	 	 	   // we need to restart from the next longest matching prefix suffix
-         {
-           // This is tricky. Consider the example
-           // AAACAAAA and i = 7.
-           len = lps[len-1]; //lps[len-1] gives the longest prefix suffix from 0 -> (len-1)
-           	   	   	   	   	 //That's the next longest matching prefix suffix
-
-           // Also, note that we do not increment i here
-         }
-         else // if (len == 0)
-         {
-           lps[i] = 0;
-           i++;
-         }
-       }
-    }
-}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////        HASH TABLE     ////////////////////////////////////////////
@@ -1115,6 +1266,45 @@ enum BOOLEAN isAnagram(const char* s, const char* t)
       abababca
 */
 
+
+void computeLPSArray(char *pat, int pattern_len, int *lps)
+{
+	//https://www.youtube.com/watch?v=KG44VoDtsAA
+	int len = 0;  /* length of the previous longest prefix suffix */
+    int i;
+    lps[0] = 0; /* lps[0] is always 0 */
+    i = 1;
+    /* the loop calculates lps[i] for i = 1 to M-1 */
+	while (i < pattern_len)
+	{
+		if (pat[i] == pat[len])
+		{
+			len++;
+			lps[i] = len;
+			i++;
+		}
+		else /* (pat[i] != pat[len]) */
+		{
+			if (len != 0) /* which means: the previous sub-pattern has a prefix same as a suffix =>
+							there is a same starting and ending sequence of length len
+							now since (pat[i] != pat[len]), which means our matching streak has stopped
+							we need to restart from the next longest matching prefix suffix */
+			{
+				/* This is tricky. Consider the example
+				 * AAACAAAA and i = 7 */
+				len = lps[len - 1]; /* lps[len-1] gives the longest prefix suffix from 0 -> (len-1)
+									   That's the next longest matching prefix suffix
+									   Also, note that we do not increment i here */
+			}
+			else  /* if (len == 0) */
+			{
+				lps[i] = 0;
+				i++;
+			}
+		}
+	}
+}
+
 void KMPSearch(char *pat, char *txt)
 {
     int M = strlen(pat);
@@ -1169,8 +1359,7 @@ void swap(char *x, char *y)
 }
 
 
-/*
-   http://www.geeksforgeeks.org/write-a-c-program-to-print-all-permutations-of-a-given-string/
+/* http://www.geeksforgeeks.org/write-a-c-program-to-print-all-permutations-of-a-given-string/
    Function to print permutations of string
    This function takes three parameters:
    1. String
@@ -1178,34 +1367,34 @@ void swap(char *x, char *y)
    3. Ending index of the string. */
 void permute(char *a, int left, int right)
 {
-   int i;
-   if (left == right) //if only 1 item left, this is one permutation
-   {
-	   printf("permutation: %s\n",a);
-   }
-   else
-   {
-       for (i = left; i <= right; i++)
-       {
-    	  /*
-    	  swap the first item with the rest, including itself !
-    	   */
-    	  swap((a+left), (a+i));
-    	  printf("new string %s\n",a);
+	int i;
+	if (left == right) //if only 1 item left, this is one permutation
+	{
+		printf("permutation: %s\n", a);
+	}
+	else
+	{
+		for (i = left; i <= right; i++)
+		{
+			/*
+			 swap the first item with the rest, including itself !
+			 */
+			swap((a + left), (a + i));
+			printf("new string %s\n", a);
 
-    	  /*
-    	  exclude 1st item, recursively do new string
-    	   */
-          permute(a, left+1, right);
-          printf("backtrack ");
+			/*
+			 exclude 1st item, recursively do new string
+			 */
+			permute(a, left + 1, right);
+			printf("backtrack ");
 
-          /*why need this backtrack:
-           we do swap in-place, meaning original string is changed -> have to swap back to restore
-           */
-          swap((a+left), (a+i)); //backtrack
-          printf("new string %s\n",a);
-       }
-   }
+			/*why need this backtrack:
+			 we do swap in-place, meaning original string is changed -> have to swap back to restore
+			 */
+			swap((a + left), (a + i)); //backtrack
+			printf("new string %s\n", a);
+		}
+	}
 }
 
 void* aligned_malloc(size_t required_bytes, size_t alignment)
@@ -1264,10 +1453,8 @@ int** My2DAlloc(int rows, int cols)
 	return rowptr;
 }
 
-/*
- * The atoi() function takes a string (which represents an integer)
- * as an argument and returns its value.
- */
+/* The atoi() function takes a string (which represents an integer)
+ * as an argument and returns its value. */
 int atoi(char* str)
 {
 	int output_int = 0;
@@ -1283,11 +1470,9 @@ int atoi(char* str)
 }
 
 
-/**
- * C++ version 0.4 char* style "itoa":
+/* C++ version 0.4 char* style "itoa":
  * Written by Lukás Chmela
- * Released under GPLv3.
-*/
+ * Released under GPLv3.*/
 char* itoa_c(int value, char* result, int base)
 {
 	// check that the base if valid
@@ -1345,8 +1530,7 @@ int majorityElement(int* nums, int numsSize)
 	 * only need to check for half of an array, excluding itself */
 
 /* Boyer–Moore majority vote algorithm
- * http://www.cs.utexas.edu/~moore/best-ideas/mjrty/example.html
- */
+ * http://www.cs.utexas.edu/~moore/best-ideas/mjrty/example.html*/
 	unsigned int counter = 0;
 	int candidate = 0;
 	unsigned int idx = 0;
@@ -1357,16 +1541,16 @@ int majorityElement(int* nums, int numsSize)
  * When we move the pointer forward over an element e:
  	 * If the counter is 0, we set the current candidate to e and we set the counter to 1.
  	 * If the counter is not 0, we increment or decrement the counter according to whether e is the current candidate.
- * When we are done, the current candidate is the majority element, if there is a majority.
- * */
+ * When we are done, the current candidate is the majority element, if there is a majority. */
 
 /* the objective of 1st pass is NOT to identify the real majority
  * but to ELIMINATE all those that's IMPOSSIBLE to be majority
  * and leave out only 1 candidate */
 	for (idx = 0; idx < numsSize; idx++)
 	{
-		if (counter == 0)
+		if (counter == 0) /* 0 to (idx -1) : no majority, all cancel out */
 		{
+			/* reset counter, assume this idx is the new majority */
 			counter++;
 			candidate = nums[idx];
 		}
@@ -1379,9 +1563,7 @@ int majorityElement(int* nums, int numsSize)
 
 /* after 1st pass, we identify one candidate that is not canceled out
  * need to 2nd pass to confirm if it's really the majority element
- * for example {1,1,1,1,3,3,3,3,7,7,9};
- */
-
+ * for example {1,1,1,1,3,3,3,3,7,7,9}; */
 	counter = 0;
 	for (idx = 0; idx < numsSize; idx ++)
 	{
@@ -1402,11 +1584,9 @@ int majorityElement(int* nums, int numsSize)
 
 /* Given a string containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.
  * The brackets must close in the correct order, "()" and "()[]{}" are all valid but "(]" and "([)]" are not. */
-enum BOOLEAN isValid(char* s)
+enum BOOLEAN isValidParenthese(char* s)
 {
 	struct ListNode* head = NULL;
-
-
 	unsigned int idx = 0;
 	for (idx = 0; s[idx] != '\0'; idx++)
 	{
@@ -1710,7 +1890,7 @@ int main ()
 	int arrToRotate[7] = {1,2,3,4,5,6,7};
 	printf("original array: ");
 	printArray(arrToRotate,0,sizeof(arrToRotate)/sizeof(arrToRotate[0])-1);
-	rotate_array(arrToRotate,sizeof(arrToRotate)/sizeof(arrToRotate[0]),3);
+	rotate_array(arrToRotate,sizeof(arrToRotate)/sizeof(arrToRotate[0]),2);
 	printf("rotate array:   ");
 	printArray(arrToRotate,0,sizeof(arrToRotate)/sizeof(arrToRotate[0])-1);
 	printf ("\n====================================================== \n");
@@ -1758,8 +1938,33 @@ int main ()
 	char* parenthese1 = "()[]{}";
 	char* parenthese2 = "([)]";
 
-	isValid(parenthese1);
-	isValid(parenthese2);
+	isValidParenthese(parenthese1);
+	isValidParenthese(parenthese2);
+	printf ("\n====================================================== \n");
+
+	/***********************test Binary Search Tree *************************/
+	printf("testing Binary Search Tree \n");
+	struct BSTnode* root = NULL, *root_clone = NULL;
+	root = BSTinsert(root,4);
+	root = BSTinsert(root,2);
+	root = BSTinsert(root,6);
+	root = BSTinsert(root,1);
+	root = BSTinsert(root,3);
+	root = BSTinsert(root,5);
+	root = BSTinsert(root,7);
+	root = BSTinsert(root,8);
+
+	printf ("BST size: %d \n", BSTsize(root));
+	printf ("BST max depth: %d \n", BSTDepth(root,1));
+	printf ("BST min depth: %d \n", BSTDepth(root,0));
+	printf ("BST min value: %d \n", BSTminValue(root));
+	printf ("BST max value: %d \n", BSTmaxValue(root));
+	printf ("in order: "); BSTinOrderTraversal(root);printf ("\n");
+	printf ("pre order: "); BSTpreOrderTraversal(root);printf ("\n");
+	printf ("post order: "); BSTpostOrderTraversal(root);printf ("\n");
+
+	root_clone = BSTclone(root);
+	printf ("clone in order: "); BSTinOrderTraversal(root_clone);printf ("\n");
 	printf ("\n====================================================== \n");
 
 	unsigned char u_char = -1;
