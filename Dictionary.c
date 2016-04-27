@@ -42,13 +42,15 @@ Dict DictCreate(void)
 
 void DictDestroy(Dict d)
 {
+	printf("DictDestroy");
 	int i;
 	struct elt *e;
 	struct elt *next;
 	for(i = 0; i < d->size; i++)
 	{
-		for(e = d->table[i]; e != 0; e = next)
+		for(e = d->table[i]; e != NULL; e = next)
 		{
+			printf(" %d",i);
 			next = e->next;
 			free(e->key);
 			free(e->value);
@@ -130,16 +132,17 @@ enum BOOLEAN DictInsertToBackWithCheck(Dict d, const char *key, const char *valu
 	struct elt* e ;
 	struct elt* tmp;
 	unsigned long h ;
-	e = malloc(sizeof(struct elt*));
+	e = malloc(sizeof(*e));
 	e->key = strdup(key);
 	e->value = strdup(value);
 	h = hash_function(key) % (d->size);
-
+	printf("DictInsertToBackWithCheck index:%d \n",h);
 	tmp = d->table[h];
 	while (tmp != NULL)
 	{
 		if (strcmp(tmp->value,e->value) == 0) {return FALSE;}
-		if (tmp->next == NULL)
+//		if (tmp->next == NULL)
+		if (0)
 		{
 			break;
 		}
@@ -151,6 +154,7 @@ enum BOOLEAN DictInsertToBackWithCheck(Dict d, const char *key, const char *valu
 
 	if (tmp == NULL)
 	{
+		printf("idx empty \n");
 		d->table[h] = e;
 	}
 	else

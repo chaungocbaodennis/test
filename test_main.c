@@ -290,8 +290,8 @@ unsigned int reverseBits(unsigned int n) {
 }
 
 /***********************************************************
- * Write a function that takes an unsigned integer and returns the number of ’1' bits it has (also known as the Hamming weight).
-For example, the 32-bit integer ’11' has binary representation 00000000000000000000000000001011, so the function should return 3.
+ * Write a function that takes an unsigned integer and returns the number of â€™1' bits it has (also known as the Hamming weight).
+For example, the 32-bit integer â€™11' has binary representation 00000000000000000000000000001011, so the function should return 3.
 ***********************************************************/
 int hammingWeight(unsigned int n) {
 	unsigned char cnt = 0;
@@ -320,7 +320,7 @@ int hammingWeight(unsigned int n) {
  */
 static int updateBits(int n, int m, int i, int j)
 {
-	int max = ~0; /* All 1’s */
+	int max = ~0; /* All 1â€™s */
 	/*
 	  in binary representation, i and j are counted from right to left, starting from 0
 	 */
@@ -342,7 +342,7 @@ static int updateBits(int n, int m, int i, int j)
 	int right = ((1 << i) - 1);
 	printf("right    : 0x%08x \n",right);
 
-	// 1’s, with 0s between i and j (including i and j)
+	// 1â€™s, with 0s between i and j (including i and j)
 	int mask = left | right;
 
 	printf("mask     : 0x%08x \n",mask);
@@ -950,7 +950,7 @@ void reverse(char *begin, char *end)
 	}
 }
 
-/* INPUT: “i like this program very much” */
+/* INPUT: â€œi like this program very muchâ€� */
 void reverseWords(char *s)
 {
     char *word_begin = NULL;
@@ -1265,8 +1265,6 @@ enum BOOLEAN isAnagram(const char* s, const char* t)
     xx|||
       abababca
 */
-
-
 void computeLPSArray(char *pat, int pattern_len, int *lps)
 {
 	//https://www.youtube.com/watch?v=KG44VoDtsAA
@@ -1277,6 +1275,8 @@ void computeLPSArray(char *pat, int pattern_len, int *lps)
     /* the loop calculates lps[i] for i = 1 to M-1 */
 	while (i < pattern_len)
 	{
+		printf("i:%d len:%d lps[] ",i,len);
+		printArray(lps,0,pattern_len-1);
 		if (pat[i] == pat[len])
 		{
 			len++;
@@ -1307,45 +1307,45 @@ void computeLPSArray(char *pat, int pattern_len, int *lps)
 
 void KMPSearch(char *pat, char *txt)
 {
-    int M = strlen(pat);
-    int N = strlen(txt);
+	int M = strlen(pat);
+	int N = strlen(txt);
 
-    // create lps[] that will hold the longest prefix suffix
-    // values for pattern
-    int *lps = (int *)malloc(sizeof(int)*M);
-    int j  = 0;  // index for pat[]
+	/* create lps[] that will hold the longest prefix suffix
+	 *  values for pattern */
+	int *lps = (int *) malloc(sizeof(int) * M);
+	int j = 0;  // index for pat[]
 
-    // Preprocess the pattern (calculate lps[] array)
-    computeLPSArray(pat, M, lps);
+	/* Preprocess the pattern (calculate lps[] array) */
+	computeLPSArray(pat, M, lps);
 
-    int i = 0;  // index for txt[]
-    while (i < N)
-    {
-      if (pat[j] == txt[i])
-      {
-        j++;
-        i++;
-      }
+	int i = 0;  // index for txt[]
+	while (i < N)
+	{
+		if (pat[j] == txt[i])
+		{
+			j++;
+			i++;
+		}
 
-      if (j == M)
-      {
-        printf("Found pattern at index %d \n", i-j);
-        j = lps[j-1];
-      }
+		if (j == M)
+		{
+			printf("Found pattern at index %d \n", i - j);
+			j = lps[j - 1];
+		}
 
-      // mismatch after j matches
-      else if (i < N && pat[j] != txt[i])
-      {
-        // Do not match lps[0..lps[j-1]] characters,
-        // they will match anyway
-    	// increase i or decrease j mean the same thing: shift pattern to right
-        if (j != 0)
-         j = lps[j-1];
-        else
-         i = i+1;
-      }
-    }
-    free(lps); // to avoid memory leak
+		/* mismatch after j matches */
+		else if (i < N && pat[j] != txt[i])
+		{
+			/* Do not match lps[0..lps[j-1]] characters,
+			 * they will match anyway
+			 *  increase i or decrease j mean the same thing: shift pattern to right */
+			if (j != 0)
+				j = lps[j - 1];
+			else
+				i = i + 1;
+		}
+	}
+	free(lps); // to avoid memory leak
 }
 
 /* Function to swap values at two pointers */
@@ -1376,22 +1376,17 @@ void permute(char *a, int left, int right)
 	{
 		for (i = left; i <= right; i++)
 		{
-			/*
-			 swap the first item with the rest, including itself !
-			 */
+			/* swap the first item with the rest, including itself ! */
 			swap((a + left), (a + i));
 			printf("new string %s\n", a);
 
-			/*
-			 exclude 1st item, recursively do new string
-			 */
+			/* exclude 1st item, recursively do new string */
 			permute(a, left + 1, right);
 			printf("backtrack ");
 
 			/*why need this backtrack:
-			 we do swap in-place, meaning original string is changed -> have to swap back to restore
-			 */
-			swap((a + left), (a + i)); //backtrack
+			 we do swap in-place, meaning original string is changed -> have to swap back to restore */
+			swap((a + left), (a + i)); /* backtrack */
 			printf("new string %s\n", a);
 		}
 	}
@@ -1405,15 +1400,13 @@ void* aligned_malloc(size_t required_bytes, size_t alignment)
 	     0 1 2 3
 	     4 5 6 7
 	     we have to allocate such as the allocated memory region cover addr "4"; so we can "set back" to 4 as starting address
-	     if let's say allocated memory 1->2, there is no way you can make it aligned, unless copy manually
-	 */
+	     if let's say allocated memory 1->2, there is no way you can make it aligned, unless copy manually */
 	void* p1; // original block
 	void** p2; // aligned block
 
 	/*the offset comprise of 2 components:
 	 (alignment - 1): to make sure allocated memory region cover "alignment addresses". For eg: if alignment is 4, those alignment addresses are 4 8 12..
-	 sizeof(void*): size of p1
-	 */
+	 sizeof(void*): size of p1 */
 	int offset = alignment - 1 + sizeof(void*);
 
 	if ((p1 = (void*)malloc(required_bytes + offset)) == NULL)
@@ -1471,7 +1464,7 @@ int atoi(char* str)
 
 
 /* C++ version 0.4 char* style "itoa":
- * Written by Lukás Chmela
+ * Written by LukÃ¡s Chmela
  * Released under GPLv3.*/
 char* itoa_c(int value, char* result, int base)
 {
@@ -1529,7 +1522,7 @@ int majorityElement(int* nums, int numsSize)
 	 * only 1 major element exist
 	 * only need to check for half of an array, excluding itself */
 
-/* Boyer–Moore majority vote algorithm
+/* Boyerâ€“Moore majority vote algorithm
  * http://www.cs.utexas.edu/~moore/best-ideas/mjrty/example.html*/
 	unsigned int counter = 0;
 	int candidate = 0;
@@ -1812,29 +1805,29 @@ int main ()
     char buf[512];
     int i;
 
-    d = DictCreate();
-
-    DictInsert(d, "foo", "hello world");
-    puts(DictSearch(d, "foo"));
-    DictInsert(d, "foo", "hello world2");
-    puts(DictSearch(d, "foo"));
-    DictDelete(d, "foo");
-    puts(DictSearch(d, "foo"));
-    DictDelete(d, "foo");
-
-    DictDelete(d, "foo");
-
-    for(i = 0; i < 10000; i++) {
-        sprintf(buf, "%d", i);
-        DictInsert(d, buf, buf);
-    }
-    DictDestroy(d);
+//    d = DictCreate();
+//
+//    DictInsert(d, "foo", "hello world");
+//    DictInsert(d, "foo", "hello world2");
+//    DictDelete(d, "foo");
+//    DictDelete(d, "foo");
+//
+//    DictDelete(d, "foo");
+//
+//    for(i = 0; i < 10000; i++) {
+//        sprintf(buf, "%d", i);
+//        DictInsert(d, buf, buf);
+//    }
+//    DictDestroy(d);
 
 	Dict d2 = DictCreate();
 	DictInsertToBackWithCheck(d2, "foo", "hello world");
 	DictInsertToBackWithCheck(d2, "foo1", "hello world1");
+	DictInsertToBackWithCheck(d2, "foo2", "hello world2");
 	DictInsertToBackWithCheck(d2, "foo", "hello world");
-	DictInsertToBackWithCheck(d2, "foo", "hello world");
+
+	DictPrint(d2);
+	DictDelete(d2, "foo");
 	DictPrint(d2);
 	DictDestroy(d2);
 
@@ -1844,7 +1837,7 @@ int main ()
 	printf("testing containsDuplicate \n");
 
 	char* arryDuplicate[5] = {"abc","e","f","g","abd"};
-	containsDuplicate(arryDuplicate, sizeof(arryDuplicate)/sizeof(arryDuplicate[0]));
+	//containsDuplicate(arryDuplicate, sizeof(arryDuplicate)/sizeof(arryDuplicate[0]));
 	printf ("\n====================================================== \n");
 
 	/***********************test hash Anagram (dictionary) *************************/
@@ -1852,7 +1845,7 @@ int main ()
 	char* s = "anagram";
 	char* t = "nagaramx";
 
-	isAnagram(s,t);
+	//isAnagram(s,t);
 	printf ("\n====================================================== \n");
 	/***********************test is Power of 2  *************************/
 	printf("testing is Power of 2 (division method) \n");
@@ -1967,6 +1960,20 @@ int main ()
 	printf ("clone in order: "); BSTinOrderTraversal(root_clone);printf ("\n");
 	printf ("\n====================================================== \n");
 
+	/***********************test KMP pattern search *************************/
+	printf("testing KMP pattern search \n");
+	char pattern[] ="abababca";
+	int* lps = (int*)malloc(sizeof(int)*((sizeof(pattern)/sizeof(pattern[0]))-1));
+	memset(lps,0,((sizeof(pattern)/sizeof(pattern[0]))-1));
+	computeLPSArray(pattern,((sizeof(pattern)/sizeof(pattern[0]))-1),lps);
+
+//	char pattern[] ="aba";
+//	unsigned int* lps = (unsigned int*)malloc(sizeof(unsigned int)*3);
+//	lps[0] = 99;lps[1] = 99;lps[2] = 99;
+//	computeLPSArray(pattern,3,lps);
+
+	printf ("\n====================================================== \n");
+
 	unsigned char u_char = -1;
 	printf("%d \n",u_char);
 	printf("%u \n",u_char);
@@ -1978,7 +1985,6 @@ int main ()
 	signed s_int = -1;
 	printf("%d \n",s_int);
 	printf("%u \n",s_int);
-
 
 	end = clock();
 	time_spent = (double)(end - begin);
